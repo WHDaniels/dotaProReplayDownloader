@@ -5,7 +5,7 @@ import time
 import json
 import os
 
-
+"""
 def findMatchUrlAndExecuteRest(recents):
     print("Creating json")
     # writes a json file containing the players recent match data
@@ -23,10 +23,44 @@ def findMatchUrlAndExecuteRest(recents):
     # list of dictionaries so iterate through each object to find where the hero_id = specified hero
     for match in recentMatches:
         if match["hero_id"] == 1:
-            heroMatch = match["match_id"]
-            heroMatchUrl = "https://www.opendota.com/matches/" + str(heroMatch)
+            heroMatch = str(match["match_id"])
+            heroMatchUrl = "https://www.opendota.com/matches/" + heroMatch
             getReplay(heroMatchUrl)
+"""
 
+def getRecentGames(selectedHero, amount):
+    d2ptLink = "http://www.dota2protracker.com/hero/" + selectedHero
+
+    options = webdriver.ChromeOptions()
+    options.add_argument('headless')
+
+    browser = webdriver.Chrome(executable_path=os.getcwd() + "\\chromedriver.exe", options=options)
+    browser.get(d2ptLink)
+
+    print("Waiting for page to load...")
+    time.sleep(1)
+
+    playerNameList = []
+    playerNameElement = browser.find_elements_by_css_selector('td.padding-cell.sorting_1 > a:nth-child(1)')
+    for a in playerNameElement:
+        playerNameList.append(a.text)
+
+    gameList = []
+    gameElement = browser.find_elements_by_css_selector('a:nth-child(3)')
+    for a in gameElement:
+        gameLink = a.get_attribute("href")
+        if gameLink == "" or gameLink is None:
+            continue
+        if "opendota" in gameLink:
+            gameList.append(gameLink)
+
+    print("\n")
+    for x in range(len(gameList[:amount])):
+        print(playerNameList[x] + ": " + gameList[x])
+    print("\n")
+
+    for game in gameList[:amount]:
+        getReplay(game)
 
 def getReplay(matchUrl):
     # the location of executable 'chromedriver' in the program directory is essential for operation
@@ -63,6 +97,9 @@ def downloadReplay(replayLink):
     fileName = fileName[0:-4]
 
     print("Downloading replay to disk")
+    # open a requests to the replay link
+    # replay = requests.get(replayLink, allow_redirects=True)
+
     # specify the path to the dota 2 replays folder
     completePath = "C:/Program Files (x86)/Steam/steamapps/common/dota 2 beta/game/dota/replays/"
     if not os.path.exists(completePath):
@@ -72,12 +109,12 @@ def downloadReplay(replayLink):
                   "is installed on a drive with a letter assignment that is neither 'C:' nor 'E:'")
 
     # Download the replay to that directory
-    open(completePath + fileName, 'wb').write(parseRecents.content)
+    open(completePath + fileName, 'wb')
     print("Download Complete! You've downloaded to:")
     print(completePath + fileName + "\n\n")
 
-
-# deletes the json (located in this programs directory) that contains the players recent games
+"""
+# deletes the json (located in this programs directory) that contains the current player's recent games
 def deleteJsonOnFinish(id):
     jsonPath = os.getcwd() + "\\" + id + ".json"
     print("Deleting: " + jsonPath)
@@ -99,34 +136,22 @@ def deleteAllJsons():
 
 # executes deleteAllJsons() when program is exited
 atexit.register(deleteAllJsons)
-
-# These are some sample pro players whose games will be parsed for now
-# Gabbi: https://www.opendota.com/players/152545459
-# Timado: https://www.opendota.com/players/97658618
-# Arteezy: https://www.opendota.com/players/86745912
-# Miracle: https://www.opendota.com/players/105248644
-# Crystallize: https://www.opendota.com/players/114619230
-# Cooman: https://www.opendota.com/players/175463659
-# Madara: https://www.opendota.com/players/95430068
-# Raven: https://www.opendota.com/players/132309493
-# 23savage: https://www.opendota.com/players/375507918
-# Mason: https://www.opendota.com/players/315657960
-# iLTW: https://www.opendota.com/players/113995822
-
-playerId = ["152545459", "97658618", "86745912", "105248644", "114619230",
-            "175463659", "95430068", "132309493", "375507918", "315657960", "113995822"]
-
-# main loop
-for id in playerId:
-    print("\n--------------------------------------")
-    parseRecents = requests.get("https://api.opendota.com/api/players/" + id + "/recentMatches", allow_redirects=True)
-
-    findMatchUrlAndExecuteRest(parseRecents)
-
-    deleteJsonOnFinish(id)
-
 """
-To be added: 1) UI
-             2) automatic hero detection (find sufficiently high mmr players that play a certain hero
-                alot without manually finding them and parse those players' recent matches)
-"""
+
+# main
+print("What is the hero you want to download replays of?")
+selectedHero = input()
+print("How many of the most recent replays do you want to download?")
+amount = int(input())
+
+getRecentGames(selectedHero, amount)
+
+
+
+
+
+
+
+
+# To be added: 1) UI
+
