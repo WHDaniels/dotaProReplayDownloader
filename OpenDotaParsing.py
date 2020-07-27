@@ -1,3 +1,8 @@
+"""
+Application that downloads 'pro-level' Dota 2 replays of the specified hero to the Dota 2 replays directory.
+Copyright (C) 2020  William Daniels under GNU General Public License (see License.md)
+"""
+
 from selenium import webdriver
 import requests
 import atexit
@@ -27,6 +32,7 @@ def findMatchUrlAndExecuteRest(recents):
             heroMatchUrl = "https://www.opendota.com/matches/" + heroMatch
             getReplay(heroMatchUrl)
 """
+
 
 def getRecentGames(selectedHero, amount):
     d2ptLink = "http://www.dota2protracker.com/hero/" + selectedHero
@@ -61,6 +67,7 @@ def getRecentGames(selectedHero, amount):
 
     for game in gameList[:amount]:
         getReplay(game)
+
 
 def getReplay(matchUrl):
     # the location of executable 'chromedriver' in the program directory is essential for operation
@@ -113,6 +120,7 @@ def downloadReplay(replayLink):
     print("Download Complete! You've downloaded to:")
     print(completePath + fileName + "\n\n")
 
+
 """
 # deletes the json (located in this programs directory) that contains the current player's recent games
 def deleteJsonOnFinish(id):
@@ -138,20 +146,63 @@ def deleteAllJsons():
 atexit.register(deleteAllJsons)
 """
 
-# main
-print("What is the hero you want to download replays of?")
-selectedHero = input()
-print("How many of the most recent replays do you want to download?")
-amount = int(input())
 
-getRecentGames(selectedHero, amount)
+from PyQt5 import QtCore, QtGui, QtWidgets
+from gui import Ui_MainWindow
 
 
+class MainWindow(QtWidgets.QMainWindow):
+    def __init__(self):
+        super(MainWindow, self).__init__()
+        self.ui = Ui_MainWindow()
+        self.ui.setupUi(self)
+
+        # local modifications to gui
+        for x in range(114):
+            self.ui.heroSelectCombo.addItem("")
+
+        for x in range(22):
+            self.ui.amountSelectCombo.addItem("")
+
+        self.ui.heroSelectCombo.setItemText(0, QtCore.QCoreApplication.translate("MainWindow", "Select Hero"))
+
+        heroList = ["Abbadon", "Alchemist", "Ancient Apparition", "Anti-Mage", "Arc Warden", "Axe", "Bane", "Batrider",
+                    "Beastmaster", "Bloodseeker", "Bounty Hunter", "Bounty Hunter", "Brewmaster", "Broodmother",
+                    "Centaur Warrunner", "Chaos Knight", "Chen", "Clinkz", "Clockwerk", "Crystal Maiden", "Dark Seer",
+                    "Dark Willow", "Dazzle", "Death Prophet", "Disruptor", "Doom", "Dragon Knight", "Drow Ranger",
+                    "Earth Spirit", "Earthshaker", "Elder Titan", "Ember Spirit", "Enchantress", "Enigma",
+                    "Faceless Void", "Grimstroke", "Gyrocopter", "Huskar", "Invoker", "Io", "Jakiro", "Juggernaut",
+                    "Keeper of the Light", "Kunkka", "Legion Commander", "Leshrac", "Lich", "Lifestealer", "Lina",
+                    "Lion", "Lone Druid", "Luna", "Lycan", "Magnus", "Mars", "Medusa", "Meepo", "Mirana", "Monkey King",
+                    "Morphling", "Naga Siren", "Nature\'s Prophet", "Necrophos", "Night Stalker", "Nyx Assassin",
+                    "Ogre Magi", "Omniknight", "Oracle", "Outworld Devourer", "Pangolier", "Phantom Assassin",
+                    "Phantom Lancer", "Phoenix", "Puck", "Pudge", "Pugna", "Queen of Pain", "Razor", "Riki", "Rubick",
+                    "Sand King", "Shadow Demon", "Shadow Fiend", "Shadow Shaman", "Skywrath Mage", "Spirit Breaker",
+                    "Storm Spirit", "Sven", "Techies", "Templar Assassin", "Terrorblade", "Tidehunter", "Timbersaw",
+                    "Tinker", "Tiny", "Treant Protector", "Troll Warlord", "Tusk", "Underlord", "Undying", "Ursa",
+                    "Vengeful Spirit", "Venomancer", "Viper", "Visage", "Void Spirit", "Warlock", "Weaver",
+                    "Windranger", "Winter Wyvern", "Witch Doctor", "Wraith King", "Zues"]
+
+        for x in range(len(heroList)):
+            self.ui.heroSelectCombo.setItemText(x + 1, QtCore.QCoreApplication.translate("MainWindow", heroList[x]))
+
+        self.ui.amountSelectCombo.setItemText(0, QtCore.QCoreApplication.translate("MainWindow", "Select Amount"))
+        for x in range(1, 21):
+            self.ui.amountSelectCombo.setItemText(x, QtCore.QCoreApplication.translate("MainWindow", str(x)))
+        self.ui.amountSelectCombo.setItemText(21, QtCore.QCoreApplication.translate("MainWindow", "All"))
+
+        self.ui.downloadButton.clicked.connect(self.pressed)
+
+    def pressed(self):
+        selectedHero = self.ui.heroSelectCombo.currentText().replace(" ", "%20")
+        amount = int(self.ui.amountSelectCombo.currentText())
+        getRecentGames(selectedHero, amount)
 
 
+if __name__ == "__main__":
+    import sys
 
-
-
-
-# To be added: 1) UI
-
+    app = QtWidgets.QApplication(sys.argv)
+    w = MainWindow()
+    w.show()
+    sys.exit(app.exec_())
