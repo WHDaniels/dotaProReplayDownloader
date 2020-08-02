@@ -2,7 +2,6 @@
 Application that downloads 'pro-level' Dota 2 replays of the specified hero to the Dota 2 replays directory.
 Copyright (C) 2020  William Daniels under GNU General Public License (see License.md)
 """
-
 from selenium import webdriver
 import requests
 import atexit
@@ -11,7 +10,7 @@ import json
 import os
 
 """
-def findMatchUrlAndExecuteRest(recents):
+def findMatchUrlFinish(recents):
     print("Creating json")
     # writes a json file containing the players recent match data
     with open(id + '.json', 'w') as file:
@@ -35,8 +34,8 @@ def findMatchUrlAndExecuteRest(recents):
 
 
 def getRecentGames(selectedHero, amount):
-    d2ptLink = "http://www.dota2protracker.com/hero/" + selectedHero
 
+    d2ptLink = "http://www.dota2protracker.com/hero/" + selectedHero
     options = webdriver.ChromeOptions()
     options.add_argument('headless')
 
@@ -103,22 +102,26 @@ def downloadReplay(replayLink):
         fileName = replayLink.rsplit('/', 1)[1]
     fileName = fileName[0:-4]
 
+    # read the data.json file in the data folder to get the dota 2 replays path
+    with open("data//data.json", 'r') as file:
+        directoryJson = json.load(file)
+
+    # grab the path
+    replaysDirectory = directoryJson["replayDirectory"]
+
+    # if the replay attempting to be downloaded already exists
+    # inside of the dota 2 replays folder, skip it
+    for file in os.listdir(replaysDirectory):
+        if file[0:-4] in fileName:
+            print("Replay already downloaded!\n\n")
+            return None
+
+
     print("Downloading replay to disk")
-    # open a requests to the replay link
-    # replay = requests.get(replayLink, allow_redirects=True)
-
-    # specify the path to the dota 2 replays folder
-    completePath = "C:/Program Files (x86)/Steam/steamapps/common/dota 2 beta/game/dota/replays/"
-    if not os.path.exists(completePath):
-        completePath = "E" + completePath[1:]
-        if not os.path.exists(completePath):
-            print("Replay directory not found. Your Dota 2 replays folder is either missing or "
-                  "is installed on a drive with a letter assignment that is neither 'C:' nor 'E:'")
-
-    # Download the replay to that directory
-    open(completePath + fileName, 'wb')
+    # else, download the replay to that directory
+    open(replaysDirectory + "/" + fileName, 'wb')
     print("Download Complete! You've downloaded to:")
-    print(completePath + fileName + "\n\n")
+    print(replaysDirectory + "/" + fileName + "\n\n")
 
 
 """
@@ -145,7 +148,6 @@ def deleteAllJsons():
 # executes deleteAllJsons() when program is exited
 atexit.register(deleteAllJsons)
 """
-
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from gui import Ui_MainWindow
@@ -191,12 +193,25 @@ class MainWindow(QtWidgets.QMainWindow):
             self.ui.amountSelectCombo.setItemText(x, QtCore.QCoreApplication.translate("MainWindow", str(x)))
         self.ui.amountSelectCombo.setItemText(21, QtCore.QCoreApplication.translate("MainWindow", "All"))
 
-        self.ui.downloadButton.clicked.connect(self.pressed)
+        self.ui.downloadButton.clicked.connect(self.downloadPressed)
+        self.ui.browseButton.clicked.connect(self.browsePressed)
 
-    def pressed(self):
+
+    def browsePressed(self):
+        dialog = QtWidgets.QFileDialog()
+        dialog.setFileMode(QtWidgets.QFileDialog.Directory)
+        if dialog.exec_():
+            directory = str(dialog.selectedFiles())
+            directory = directory[2:len(directory)-2]
+            replayDirectory = {"replayDirectory": directory}
+            with open("data\\data.json", 'w') as file:
+                json.dump(replayDirectory, file)
+
+    def downloadPressed(self):
         selectedHero = self.ui.heroSelectCombo.currentText().replace(" ", "%20")
         amount = int(self.ui.amountSelectCombo.currentText())
         getRecentGames(selectedHero, amount)
+
 
 
 if __name__ == "__main__":
