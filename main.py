@@ -32,9 +32,12 @@ def findMatchUrlFinish(recents):
             getReplay(heroMatchUrl)
 """
 
+# gets the robots.txt file of the site and copies it to the program directory
+robotsTxt = requests.get("http://www.dota2protracker.com/robots.txt", allow_redirects=True)
+open('robots.txt', 'wb').write(robotsTxt.content)
+
 
 def getRecentGames(selectedHero, amount):
-
     d2ptLink = "http://www.dota2protracker.com/hero/" + selectedHero
     options = webdriver.ChromeOptions()
     options.add_argument('headless')
@@ -116,7 +119,6 @@ def downloadReplay(replayLink):
             print("Replay already downloaded!\n\n")
             return None
 
-
     print("Downloading replay to disk")
     # else, download the replay to that directory
     open(replaysDirectory + "/" + fileName, 'wb')
@@ -196,13 +198,12 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.downloadButton.clicked.connect(self.downloadPressed)
         self.ui.browseButton.clicked.connect(self.browsePressed)
 
-
     def browsePressed(self):
         dialog = QtWidgets.QFileDialog()
         dialog.setFileMode(QtWidgets.QFileDialog.Directory)
         if dialog.exec_():
             directory = str(dialog.selectedFiles())
-            directory = directory[2:len(directory)-2]
+            directory = directory[2:len(directory) - 2]
             replayDirectory = {"replayDirectory": directory}
             with open("data\\data.json", 'w') as file:
                 json.dump(replayDirectory, file)
@@ -211,7 +212,6 @@ class MainWindow(QtWidgets.QMainWindow):
         selectedHero = self.ui.heroSelectCombo.currentText().replace(" ", "%20")
         amount = int(self.ui.amountSelectCombo.currentText())
         getRecentGames(selectedHero, amount)
-
 
 
 if __name__ == "__main__":
