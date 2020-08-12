@@ -130,12 +130,100 @@ class MainWindow(QMainWindow):
                 json.dump(replayDirectory, file)
 
     def downloadPressed(self):
+        replaysList = self.getReplayFolderSnapshot()
         selectedHero = self.ui.heroSelectCombo.currentText().replace(" ", "%20")
         amount = int(self.ui.amountSelectCombo.currentText())
 
         self.ui.progressBar.show()
         MainWindow.getRecentGames(self, selectedHero, amount, browser())
         self.ui.progressBar.setProperty("value", 100)
+
+        self.showPopup(browser(), replaysList)
+
+    def showPopup(self, browser, replaysList):
+        popup = QMessageBox()
+        popup.setWindowTitle("Games Downloaded")
+
+        amount = int(self.ui.amountSelectCombo.currentText())
+        playerList = self.playerGameList(browser)[0][:amount]
+        gameList = self.playerGameList(browser)[1][:amount]
+
+        for x in reversed(range(len(gameList))):
+            matchID = gameList[x].rsplit('/', 1)[-1]
+            # only show games that were downloaded (not skipped)
+            for file in replaysList:
+                if matchID in file:
+                    gameList.pop(x)
+                    playerList.pop(x)
+                    break
+
+        setText = []
+
+        for y in range(len(gameList)):
+            setText.append(playerList[y] + ": " + gameList[y] + "\t")
+
+        # setText.insert(0, "Player\t\tMatch ID\n\n")
+        # setText.insert(0, "These are the games you have downloaded:\n")
+        setTextString = "\n".join(setText)
+        popup.setText(setTextString)
+        popup.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
+
+        popup.open()
+
+        x = popup.exec_()
+
+    def playerGameList(self, browser):
+        """
+        playerList = []
+
+        playerElement = browser.find_elements_by_css_selector('td.padding-cell.sorting_1 > a:nth-child(1)')
+        for a in playerElement:
+            playerList.append(a.text)
+
+        gameList = []
+
+        gameElement = browser.find_elements_by_css_selector('a:nth-child(3)')
+        for a in gameElement:
+            gameLink = a.get_attribute("href")
+            if gameLink == "" or gameLink is None:
+                continue
+            if "opendota" in gameLink:
+                gameList.append(gameLink)
+
+        """
+
+        playerList = ['Zai', 'CeMaTheSlayeR', 'CeMaTheSlayeR', 'TANNER', 'Husky', 'Fly', 'Save', 'Lelis',
+                          'CeMaTheSlayeR', 'Dubu',
+                          'Fly', 'CeMaTheSlayeR', 'Gorgc', 'syndereN', 'Save', 'Moo', 'Aui_2000', 'CeMaTheSlayeR',
+                          'CeMaTheSlayeR', 'Fenrir']
+        gameList = ['https://www.opendota.com/matches/5561811440', 'https://www.opendota.com/matches/5560165456',
+                    'https://www.opendota.com/matches/5558359144', 'https://www.opendota.com/matches/5556945284',
+                    'https://www.opendota.com/matches/5555907600', 'https://www.opendota.com/matches/5555570042',
+                    'https://www.opendota.com/matches/5554501566', 'https://www.opendota.com/matches/5554356649',
+                    'https://www.opendota.com/matches/5554010304', 'https://www.opendota.com/matches/5553074950',
+                    'https://www.opendota.com/matches/5552729721', 'https://www.opendota.com/matches/5552449335',
+                    'https://www.opendota.com/matches/5552452158', 'https://www.opendota.com/matches/5552389075',
+                    'https://www.opendota.com/matches/5551793654', 'https://www.opendota.com/matches/5551577246',
+                    'https://www.opendota.com/matches/5551106090', 'https://www.opendota.com/matches/5550983896',
+                    'https://www.opendota.com/matches/5550929864', 'https://www.opendota.com/matches/5550412518']
+
+        return playerList, gameList
+
+    def getReplayFolderSnapshot(self):
+        # read the data.json file in the data folder to get the dota 2 replays path
+        with open("data//data.json", 'r') as file:
+            directoryJson = json.load(file)
+
+        # grab the path
+        replaysDirectory = directoryJson["replayDirectory"]
+
+        replaysList = []
+
+        for file in os.listdir(replaysDirectory):
+            if '.dem' in file:
+                replaysList.append(file)
+
+        return replaysList
 
     def getRecentGames(self, selectedHero, amount, browser):
         # d2ptLink = "http://www.dota2protracker.com/hero/" + selectedHero
@@ -147,11 +235,11 @@ class MainWindow(QMainWindow):
         # playerNameList = []
 
         # temp ----
-        playerNameList = ['Zai', 'CeMaTheSlayeR', 'CeMaTheSlayeR', 'TANNER', 'Husky', 'Fly', 'Save', 'Lelis',
-                          'CeMaTheSlayeR', 'Dubu',
-                          'Fly', 'CeMaTheSlayeR', 'Gorgc', 'syndereN', 'Save', 'Moo', 'Aui_2000', 'CeMaTheSlayeR',
-                          'CeMaTheSlayeR',
-                          'Fenrir']
+        # playerNameList = ['Zai', 'CeMaTheSlayeR', 'CeMaTheSlayeR', 'TANNER', 'Husky', 'Fly', 'Save', 'Lelis',
+        #                  'CeMaTheSlayeR', 'Dubu',
+        #                  'Fly', 'CeMaTheSlayeR', 'Gorgc', 'syndereN', 'Save', 'Moo', 'Aui_2000', 'CeMaTheSlayeR',
+        #                  'CeMaTheSlayeR',
+        #                  'Fenrir']
         # temp ----
 
         # playerNameElement = browser.find_elements_by_css_selector('td.padding-cell.sorting_1 > a:nth-child(1)')
@@ -161,6 +249,7 @@ class MainWindow(QMainWindow):
         # gameList = []
 
         # temp ----
+        """
         gameList = ['https://www.opendota.com/matches/5561811440', 'https://www.opendota.com/matches/5560165456',
                     'https://www.opendota.com/matches/5558359144', 'https://www.opendota.com/matches/5556945284',
                     'https://www.opendota.com/matches/5555907600', 'https://www.opendota.com/matches/5555570042',
@@ -172,6 +261,7 @@ class MainWindow(QMainWindow):
                     'https://www.opendota.com/matches/5551106090', 'https://www.opendota.com/matches/5550983896',
                     'https://www.opendota.com/matches/5550929864', 'https://www.opendota.com/matches/5550412518']
         # temp ----
+        
 
         gameElement = browser.find_elements_by_css_selector('a:nth-child(3)')
         for a in gameElement:
@@ -180,8 +270,10 @@ class MainWindow(QMainWindow):
                 continue
             if "opendota" in gameLink:
                 gameList.append(gameLink)
+        """
 
         downloadProgress = 0
+        gameList = self.playerGameList(browser)[1]
         gameAmount = len(gameList[:amount])
 
         for game in gameList[:amount]:
