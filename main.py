@@ -75,19 +75,12 @@ def downloadReplay(replayLink):
         fileName = replayLink.rsplit('/', 1)[1]
         fileName = fileName[0:-4]
 
-    # read the data.json file in the data folder to get the dota 2 replays path
-    with open("data//data.json", 'r') as file:
-        directoryJson = json.load(file)
+        # read the data.json file in the data folder to get the dota 2 replays path
+        with open("data//data.json", 'r') as file:
+            directoryJson = json.load(file)
 
-    # grab the path
-    replaysDirectory = directoryJson["replayDirectory"]
-
-    # if the replay attempting to be downloaded already exists
-    # inside of the dota 2 replays folder, skip it
-    for file in os.listdir(replaysDirectory):
-        if file[0:-4] in fileName:
-            print("Replay already downloaded!\n\n")
-            return None
+        # grab the path
+        replaysDirectory = directoryJson["replayDirectory"]
 
     print("Downloading replay to disk")
     # else, download the replay to that directory
@@ -197,6 +190,9 @@ def showPopup(replaysList, playerList, gameList):
         setText.insert(0, "Of the " + str(originalGameList) + " replay(s) specified and available for download, \n"
                        + str(duplicates) + " is/are downloaded already. \n\n")
 
+    if len(gameList) == 0:
+        setText.insert(2, ":(")
+
     setTextString = "\n".join(setText)
     popup.setText(setTextString)
     popup.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
@@ -275,11 +271,33 @@ class MainWindow(QMainWindow):
         gameAmount = len(gameList)
 
         for game in gameList:
-            getReplay(game, browser)
+
+            # read the data.json file in the data folder to get the dota 2 replays path
+            with open("data//data.json", 'r') as file:
+                directoryJson = json.load(file)
+
+            # grab the path
+            replaysDirectory = directoryJson["replayDirectory"]
+
+            matchID = game.rsplit('/', 1)[-1]
+            duplicate = False
+
+            # if the replay attempting to be downloaded already exists
+            # inside of the dota 2 replays folder, skip it
+            for file in os.listdir(replaysDirectory):
+                if matchID in file:
+                    print("Replay already downloaded!\n\n")
+                    duplicate = True
+                    break
+
+            if duplicate is False:
+                getReplay(game, browser)
 
             downloadProgress += int((1 / gameAmount) * 100)
             self.ui.progressBar.setProperty("value", downloadProgress)
             QApplication.processEvents()
+
+
 
 
 if __name__ == "__main__":
