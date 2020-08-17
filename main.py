@@ -34,7 +34,11 @@ def downloadReplay(replayLink):
 
     print("Downloading replay to disk")
     # download the replay to the replays directory
+
+    # IF THE DIRECTORY EXISTS----------------------------------------
     open(getReplaysDirectory() + "/" + fileName, 'wb')
+
+    # add catch for this ^^------------------------------------------
     print("Downloaded to: " + getReplaysDirectory() + "/" + fileName)
 
 
@@ -155,8 +159,42 @@ def showPopup(replaysList, playerList, gameList):
     popup.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
 
     popup.open()
-
     x = popup.exec_()
+
+
+def directoryNotFound():
+    errMsg = QMessageBox()
+    errMsg.setWindowTitle("Directory not found")
+
+    errMsg.setText("The directory you have set does not exist.\n\n "
+                   "Please select your Dota 2 replays directory with the"
+                   " \"Browse...\" button before attempting to download.")
+
+    errMsg.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
+    errMsg.open()
+    x = errMsg.exec_()
+
+
+def noHero():
+    errMsg = QMessageBox()
+    errMsg.setWindowTitle("Hero not specified")
+
+    errMsg.setText("Please specify a hero before attempting to download.")
+
+    errMsg.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
+    errMsg.open()
+    x = errMsg.exec_()
+
+
+def noAmount():
+    errMsg = QMessageBox()
+    errMsg.setWindowTitle("Amount not specified")
+
+    errMsg.setText("Please specify the download amount before attempting to download.")
+
+    errMsg.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
+    errMsg.open()
+    x = errMsg.exec_()
 
 
 # gui for the program
@@ -167,12 +205,10 @@ class MainWindow(QMainWindow):
         self.ui.setupUi(self)
 
         # start local modifications to gui
-        for x in range(114):
-            self.ui.heroSelectCombo.addItem("")
-
-        for x in range(22):
+        for x in range(21):
             self.ui.amountSelectCombo.addItem("")
 
+        self.ui.heroSelectCombo.addItem("")
         self.ui.heroSelectCombo.setItemText(0, QCoreApplication.translate("MainWindow", "Select Hero"))
 
         heroList = ["Abbadon", "Alchemist", "Ancient Apparition", "Anti-Mage", "Arc Warden", "Axe", "Bane", "Batrider",
@@ -194,20 +230,34 @@ class MainWindow(QMainWindow):
                     "Wraith King", "Zues"]
 
         for x in range(len(heroList)):
+            self.ui.heroSelectCombo.addItem("")
             self.ui.heroSelectCombo.setItemText(x + 1, QCoreApplication.translate("MainWindow", heroList[x]))
 
         self.ui.amountSelectCombo.setItemText(0, QCoreApplication.translate("MainWindow", "Select Amount"))
         for x in range(1, 21):
             self.ui.amountSelectCombo.setItemText(x, QCoreApplication.translate("MainWindow", str(x)))
-        self.ui.amountSelectCombo.setItemText(21, QCoreApplication.translate("MainWindow", "All"))
 
         self.ui.downloadButton.clicked.connect(self.downloadPressed)
         self.ui.browseButton.clicked.connect(browsePressed)
         # end local modifications to gui
 
     def downloadPressed(self):
+
+        if not os.path.isdir(getReplaysDirectory()):
+            directoryNotFound()
+            return None
+
+        if self.ui.heroSelectCombo.currentText() == "Select Hero":
+            noHero()
+            return None
+
+        if self.ui.amountSelectCombo.currentText() == "Select Amount":
+            noAmount()
+            return None
+
         replaysList = getReplayFolderSnapshot()
         selectedHero = self.ui.heroSelectCombo.currentText().replace(" ", "%20")
+
         amount = int(self.ui.amountSelectCombo.currentText())
 
         # preparing options for chromedriver
