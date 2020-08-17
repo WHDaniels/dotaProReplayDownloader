@@ -25,9 +25,13 @@
   
   As a side note, one must still open the Dota 2 client and *download* the replays manually once they are in the replays directory.
   Unfortunately, match replays cannot be fully installed through means outside of the client.
+  
   This does mean however, that space will not be taken up unnecessarily on your hard disk due to replays downloaded by the program, 
   as only the file name of the replay need be correct to have the client recognize it as a downloadable replay.
   In other words, until downloaded in-game, every replay downloaded through Dota Pro Replay Downloader are empty files and take up no space.
+  
+  That being said, Valve does set a time limit on replay acquisition: replays are only available for **8 days** after the game took place.
+  So if one wants to store a watchable replay, they should download from the client before that time limit is reached.
   
   ## Installation
   (WIP)
