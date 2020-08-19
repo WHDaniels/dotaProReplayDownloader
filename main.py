@@ -35,10 +35,7 @@ def downloadReplay(replayLink):
     print("Downloading replay to disk")
     # download the replay to the replays directory
 
-    # IF THE DIRECTORY EXISTS----------------------------------------
     open(getReplaysDirectory() + "/" + fileName, 'wb')
-
-    # add catch for this ^^------------------------------------------
     print("Downloaded to: " + getReplaysDirectory() + "/" + fileName)
 
 
