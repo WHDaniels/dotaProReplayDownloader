@@ -23,6 +23,8 @@
   - The hero which you want to download replays of
   - The number of replays you wish to download
   
+  (Once a directory is selected it stays memorized. So one will only need to specify a directory once unless they want to change it in the future.)
+
   Then simply press *Download* to install the replays
   
   As a side note, one must still open the Dota 2 client and *download* the replays manually once they are in the replays directory.
