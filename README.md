@@ -15,6 +15,8 @@
   that preforms the same actions one would take to download replays manually and should just be used as a time-saving replacement.
   
   ## Use
+  You will need Google Chrome installed to run this application.
+  
   Once opened, you should specify:
   - What directory to download replays to, usually located in 
   *Program Files (x86)\Steam\steamapps\common\dota 2 beta\game\dota\replays* 
@@ -37,6 +39,13 @@
   For installation, simply download and run the [setup.exe](setup.exe) file located in this repository.
 
   To uninstall, find the download location and run the built-in uninstaller executable.
+  
+  ## Issues and Bugs
+  If you find a problem with this program or run into any crashes and/or bugs, please add an issue to let me know.
+  
+  With every new Chrome version this program will have to be updated and repackaged with the corresponding chromedriver executeable. If
+  there are any crashes they are most likely due to the fact that I have not updated this yet. As stated before, if this is hindering your 
+  ability to download replays just leave a issue open. (Alternatively one could restore Chrome to the previous version as a workaround.)
   
   
 ***The GNU General Public License (located in [LICENSE.md](/LICENSE.md)) applies to all files in this repository.***
