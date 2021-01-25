@@ -32,10 +32,10 @@
   
   This does mean however, that space will not be taken up unnecessarily on your hard disk due to replays downloaded by the program, 
   as only the file name of the replay need be correct to have the client recognize it as a downloadable replay.
-  In other words, until downloaded in-game, every replay downloaded through Dota Pro Replay Downloader are empty files and take up no space.
+  In other words, until downloaded in-game, every replay downloaded through Dota Pro Replay Downloader is an empty file and takes up no space.
   
-  That being said, Valve does set a time limit on replay acquisition: replays are only available for **8 days** after the game took place.
-  So if one wants to store a watchable replay, they should download from the client before that time limit is reached.
+  That being said, Valve does set a time limit on replay acquisition: replays are only available for **8 days** after the game takes place.
+  So if one wants to store a watchable replay, they should download it from the client before that time limit is reached.
   
   ## Installation
   For installation, simply download and run the [setup.exe](setup.exe) file located in this repository.
